@@ -53,18 +53,18 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         
         for _, owner in pairs(businessOwners) do
             if owner == identifier then
-                TriggerClientEvent("vorp:TipRight", src, "You already own a business.", 3000)
+                TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_AlreadyOwnBusiness, 3000)
                 return
             end
         end
 
         if businessOwners[index] then
-            TriggerClientEvent("vorp:TipRight", src, "This business is already bought.", 3000)
+            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_AlreadyHasOwner, 3000)
             return
         end
 
         if character.money < business.price then
-            TriggerClientEvent("vorp:TipRight", src, "You don't have enough money.", 3000)
+            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotEnoughMoney, 3000)
             return
         end
 
@@ -77,12 +77,12 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
 
         businessOwners[index] = identifier
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners, identifier)
-        TriggerClientEvent("vorp:TipBottom", src, "You successfully bought the business.", 4000)
+        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_BoughtBusiness, 4000)
 
     elseif action == "sell" then
 
         if businessOwners[index] ~= identifier then
-            TriggerClientEvent("vorp:TipRight", src, "You don't own this business.", 3000)
+            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotOwner, 3000)
             return
         end
 
@@ -96,18 +96,18 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
 
         businessOwners[index] = nil
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners, identifier)
-        TriggerClientEvent("vorp:TipBottom", src, "You sold the business for " .. refund .. " $", 4000)
+        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_SoldBusiness .. " " .. refund .. " $", 4000)
 
     elseif action == "transfer" and targetId then
 
         if businessOwners[index] ~= identifier then
-            TriggerClientEvent("vorp:TipRight", src, "You don't own this business.", 3000)
+            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotOwner, 3000)
             return
         end
 
         local TargetUser = VorpCore.getUser(tonumber(targetId))
         if not TargetUser then
-            TriggerClientEvent("vorp:TipRight", src, "Invalid destination.", 3000)
+            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_InvalidDestination, 3000)
             return
         end
 
@@ -117,7 +117,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
 
         for _, owner in pairs(businessOwners) do
             if owner == targetIdentifier then
-                TriggerClientEvent("vorp:TipRight", src, "The destination player already owns a business.", 3000)
+                TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_TargetOwnsBusiness, 3000)
                 return
             end
         end
@@ -135,6 +135,6 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJobGrade(0)
 
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners)
-        TriggerClientEvent("vorp:TipBottom", src, "You have successfully transferred the business.", 4000)
+        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_TransferSuccess, 4000)
     end
 end)
