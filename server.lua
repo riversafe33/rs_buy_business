@@ -151,6 +151,6 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         businessOwners[index] = targetCharIdentifier
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners, charIdentifier)
         TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_TransferSuccess, 4000)
-        TriggerClientEvent("vorp:TipBottom", tonumber(targetId), Config.Locale.Tip_YouHaveNewBusiness, "Has recibido un nuevo negocio.", 4000)
+        TriggerClientEvent("vorp:TipBottom", tonumber(targetId), Config.Locale.Tip_YouHaveNewBusiness, 4000)
     end
 end)
