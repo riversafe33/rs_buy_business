@@ -45,24 +45,26 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
     local User = VorpCore.getUser(src)
     local character = User.getUsedCharacter
     local identifier = character.identifier
+    local charid = character.charIdentifier
     local business = Config.Businesses[index]
     if not business then return end
 
     if action == "buy" then
+        
         for _, owner in pairs(businessOwners) do
             if owner == identifier then
-                TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_AlreadyOwnBusiness, 3000)
+                TriggerClientEvent("vorp:TipRight", src, "You already own a business.", 3000)
                 return
             end
         end
 
         if businessOwners[index] then
-            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_AlreadyHasOwner, 3000)
+            TriggerClientEvent("vorp:TipRight", src, "This business is already bought.", 3000)
             return
         end
 
         if character.money < business.price then
-            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotEnoughMoney, 3000)
+            TriggerClientEvent("vorp:TipRight", src, "You don't have enough money.", 3000)
             return
         end
 
@@ -71,16 +73,16 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJobGrade(tonumber(business.grade))
 
         exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {business.job, business.grade, identifier})
-        exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {index, identifier})
+        exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id, charid) VALUES (?, ?, ?)", {index, identifier, charid})
 
         businessOwners[index] = identifier
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners, identifier)
-        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_BoughtBusiness, 4000)
+        TriggerClientEvent("vorp:TipBottom", src, "You successfully bought the business.", 4000)
 
     elseif action == "sell" then
 
         if businessOwners[index] ~= identifier then
-            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotOwner, 3000)
+            TriggerClientEvent("vorp:TipRight", src, "You don't own this business.", 3000)
             return
         end
 
@@ -94,27 +96,28 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
 
         businessOwners[index] = nil
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners, identifier)
-        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_SoldBusiness .. " " .. refund .. " $", 4000)
+        TriggerClientEvent("vorp:TipBottom", src, "You sold the business for " .. refund .. " $", 4000)
 
     elseif action == "transfer" and targetId then
 
         if businessOwners[index] ~= identifier then
-            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_NotOwner, 3000)
+            TriggerClientEvent("vorp:TipRight", src, "You don't own this business.", 3000)
             return
         end
 
         local TargetUser = VorpCore.getUser(tonumber(targetId))
         if not TargetUser then
-            TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_InvalidDestination, 3000)
+            TriggerClientEvent("vorp:TipRight", src, "Invalid destination.", 3000)
             return
         end
 
         local TargetCharacter = TargetUser.getUsedCharacter
         local targetIdentifier = TargetCharacter.identifier
+        local targetCharid = TargetCharacter.charIdentifier
 
         for _, owner in pairs(businessOwners) do
             if owner == targetIdentifier then
-                TriggerClientEvent("vorp:TipRight", src, Config.Locale.Tip_TargetOwnsBusiness, 3000)
+                TriggerClientEvent("vorp:TipRight", src, "The destination player already owns a business.", 3000)
                 return
             end
         end
@@ -126,12 +129,12 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {business.job, business.grade, targetIdentifier})
         exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {"unemployed", 0, identifier})
         exports.ghmattimysql:execute("DELETE FROM business_owners WHERE business_id = ? AND owner_id = ?", {index, identifier})
-        exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {index, targetIdentifier})
+        exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id, charid) VALUES (?, ?, ?)", {index, targetIdentifier, targetCharid})
 
         character.setJob("unemployed", 0)
         character.setJobGrade(0)
 
         TriggerClientEvent("rs_buy_business:setOwners", -1, businessOwners)
-        TriggerClientEvent("vorp:TipBottom", src, Config.Locale.Tip_TransferSuccess, 4000)
+        TriggerClientEvent("vorp:TipBottom", src, "You have successfully transferred the business.", 4000)
     end
 end)
