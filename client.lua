@@ -1,9 +1,10 @@
-local VorpCore = exports.vorp_core:GetCore()Add commentMore actions
+local VorpCore = exports.vorp_core:GetCore()
 local Menu = exports.vorp_menu:GetMenuData()
 local prompt = nil
 local businessOwners = {}
-local myIdentifier = nil
+local myCharIdentifier = nil
 local currentBusinessIndex = nil
+local tempOwners = nil
 
 Citizen.CreateThread(function()
     Wait(2000)
@@ -11,15 +12,42 @@ Citizen.CreateThread(function()
 end)
 
 RegisterNetEvent("rs_buy_business:setPlayerIdentifier")
-AddEventHandler("rs_buy_business:setPlayerIdentifier", function(identifier)
-    myIdentifier = identifier
+AddEventHandler("rs_buy_business:setPlayerIdentifier", function(charIdentifier)
+    if not charIdentifier or charIdentifier == "" then
+        Citizen.SetTimeout(1000, function()
+            TriggerServerEvent("rs_buy_business:getPlayerIdentifier")
+        end)
+        return
+    end
+
+    myCharIdentifier = charIdentifier
+
     TriggerServerEvent("rs_buy_business:requestOwnerData")
+
+    if tempOwners then
+        businessOwners = tempOwners
+        tempOwners = nil
+    end
 end)
 
+
 RegisterNetEvent("rs_buy_business:setOwners")
-AddEventHandler("rs_buy_business:setOwners", function(businessData)
-    businessOwners = businessData
+AddEventHandler("rs_buy_business:setOwners", function(owners)
+
+    if not owners or type(owners) ~= "table" then
+        return
+    end
+
+    if myCharIdentifier and myCharIdentifier ~= "" then
+        businessOwners = owners
+        tempOwners = nil
+    else
+        tempOwners = owners
+    end
 end)
+
+
+
 
 local function createPrompt()
     if not prompt then
@@ -28,14 +56,17 @@ local function createPrompt()
         prompt:setVisible(false)
 
         prompt:setOnControlJustPressed(function()
-            if not currentBusinessIndex then return end
+
+            if not currentBusinessIndex then
+                return
+            end
 
             local businessIndex = currentBusinessIndex
             local owner = businessOwners[businessIndex]
             local alreadyOwns = false
 
             for businessId, ownerId in pairs(businessOwners) do
-                if ownerId == myIdentifier and businessId ~= businessIndex then
+                if ownerId == myCharIdentifier and businessId ~= businessIndex then
                     alreadyOwns = true
                     break
                 end
@@ -47,7 +78,7 @@ local function createPrompt()
                 else
                     openBusinessMenu(businessIndex)
                 end
-            elseif owner == myIdentifier then
+            elseif owner == myCharIdentifier then
                 openBusinessMenu(businessIndex)
             else
                 TriggerEvent("vorp:TipRight", Config.Locale.Tip_AlreadyHasOwner, 3000)
@@ -59,7 +90,9 @@ end
 Citizen.CreateThread(function()
     while true do
         Wait(500)
-        if not businessOwners or not myIdentifier then goto continue end
+        if not businessOwners or not myCharIdentifier then
+            goto continue
+        end
 
         local playerPed = PlayerPedId()
         local playerCoords = GetEntityCoords(playerPed)
@@ -74,13 +107,13 @@ Citizen.CreateThread(function()
 
             local alreadyOwns = false
             for businessName, ownerId in pairs(businessOwners) do
-                if ownerId == myIdentifier and businessName ~= i then
+                if ownerId == myCharIdentifier and businessName ~= i then
                     alreadyOwns = true
                     break
                 end
             end
 
-            local shouldShow = dist < 2.0 and ((owner == nil and not alreadyOwns) or (owner == myIdentifier))
+            local shouldShow = dist < 2.0 and ((owner == nil and not alreadyOwns) or (owner == myCharIdentifier))
 
             if shouldShow and dist < minDist then
                 minDist = dist
@@ -114,15 +147,11 @@ function openBusinessMenu(index)
     local elements = {}
     local business = Config.Businesses[index]
 
-    if businessOwners[index] == myIdentifier then
+    if businessOwners[index] == myCharIdentifier then
         table.insert(elements, {label = Config.Locale.Menu.SellLabel, value = "sell", desc = Config.Locale.Menu.SellDesc})
         table.insert(elements, {label = Config.Locale.Menu.TransferLabel, value = "transfer", desc = Config.Locale.Menu.TransferDesc})
     else
-        table.insert(elements, {
-            label = Config.Locale.Menu.BuyLabel,
-            value = "buy",
-            desc = Config.Locale.Menu.BuyDescPrefix .. business.price
-        })
+        table.insert(elements, {label = Config.Locale.Menu.BuyLabel, value = "buy", desc = Config.Locale.Menu.BuyDescPrefix .. business.price})
     end
 
     Menu.CloseAll()
@@ -151,14 +180,14 @@ function OpenSellInput(index)
     local myInput = {
         type = "enableinput",
         inputType = "input",
-        button = Config.Locale.Input.Button,
-        placeholder = Config.Locale.Input.Placeholder,
+        button = "Confirmar",
+        placeholder = "ID del Jugador",
         style = "block",
         attributes = {
-            inputHeader = Config.Locale.Input.Header,
+            inputHeader = "Transferir Negocio",
             type = "text",
             pattern = "[0-9]+",
-            title = Config.Locale.Input.Title,
+            title = "Solo números",
             style = "border-radius: 10px; background-color: ; border:none;"
         }
     }
