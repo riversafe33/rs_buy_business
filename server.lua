@@ -2,7 +2,7 @@ local VorpCore = exports.vorp_core:GetCore()
 local businessOwners = {}
 
 Citizen.CreateThread(function()
-    exports.ghmattimysql:execute('SELECT * FROM business_owners', {}, function(result)
+    exports.oxmysql:execute('SELECT * FROM business_owners', {}, function(result)
         for _, row in ipairs(result) do
             local businessId = tonumber(row.business_id)
             if businessId then
@@ -75,11 +75,11 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJob(business.job)
         character.setJobGrade(tonumber(business.grade))
 
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
+        exports.oxmysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
             business.job, business.grade, charIdentifier
         })
 
-        exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {
+        exports.oxmysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {
             index, charIdentifier
         })
 
@@ -98,11 +98,11 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJob("unemployed", 0)
         character.setJobGrade(0)
 
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
+        exports.oxmysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
             "unemployed", 0, charIdentifier
         })
 
-        exports.ghmattimysql:execute("DELETE FROM business_owners WHERE business_id = ? AND owner_id = ?", {
+        exports.oxmysql:execute("DELETE FROM business_owners WHERE business_id = ? AND owner_id = ?", {
             index, charIdentifier
         })
 
@@ -132,19 +132,19 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
             end
         end
 
-        exports.ghmattimysql:execute("UPDATE business_owners SET owner_id = ? WHERE business_id = ?", {
+        exports.oxmysql:execute("UPDATE business_owners SET owner_id = ? WHERE business_id = ?", {
             targetCharIdentifier, index
         })
 
         TargetCharacter.setJob(business.job)
         TargetCharacter.setJobGrade(tonumber(business.grade))
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
+        exports.oxmysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
             business.job, business.grade, targetCharIdentifier
         })
 
         character.setJob("unemployed", 0)
         character.setJobGrade(0)
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
+        exports.oxmysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {
             "unemployed", 0, charIdentifier
         })
 
