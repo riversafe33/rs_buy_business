@@ -30,7 +30,6 @@ AddEventHandler("rs_buy_business:setPlayerIdentifier", function(charIdentifier)
     end
 end)
 
-
 RegisterNetEvent("rs_buy_business:setOwners")
 AddEventHandler("rs_buy_business:setOwners", function(owners)
 
@@ -45,9 +44,6 @@ AddEventHandler("rs_buy_business:setOwners", function(owners)
         tempOwners = owners
     end
 end)
-
-
-
 
 local function createPrompt()
     if not prompt then
