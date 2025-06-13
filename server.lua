@@ -6,14 +6,14 @@ Citizen.CreateThread(function()
         for _, row in ipairs(result) do
             local businessId = tonumber(row.business_id)
             if businessId then
-                businessOwners[businessId] = row.owner_id
+                businessOwners[businessId] = tonumber(row.owner_id)
             end
         end
 
         for _, playerId in ipairs(GetPlayers()) do
             local user = VorpCore.getUser(tonumber(playerId))
             local character = user.getUsedCharacter
-            TriggerClientEvent("rs_buy_business:setOwners", tonumber(playerId), businessOwners, character.identifier)
+            TriggerClientEvent("rs_buy_business:setOwners", tonumber(playerId), businessOwners, character.charIdentifier)
         end
     end)
 end)
@@ -21,7 +21,9 @@ end)
 RegisterServerEvent("rs_buy_business:getPlayerIdentifier")
 AddEventHandler("rs_buy_business:getPlayerIdentifier", function()
     local playerId = source
-    local identifier = GetPlayerIdentifiers(playerId)[1]
+    local User = VorpCore.getUser(playerId)
+    local character = User.getUsedCharacter
+    local identifier = character.charIdentifier
     
     TriggerClientEvent("rs_buy_business:setPlayerIdentifier", playerId, identifier)
 end)
@@ -36,7 +38,7 @@ AddEventHandler("rs_buy_business:requestOwnerData", function()
     local src = source
     local user = VorpCore.getUser(src)
     local character = user.getUsedCharacter
-    TriggerClientEvent("rs_buy_business:setOwners", src, businessOwners, character.identifier)
+    TriggerClientEvent("rs_buy_business:setOwners", src, businessOwners, character.charIdentifier)
 end)
 
 RegisterServerEvent("rs_buy_business:handleAction")
@@ -44,7 +46,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
     local src = source
     local User = VorpCore.getUser(src)
     local character = User.getUsedCharacter
-    local identifier = character.identifier
+    local identifier = character.charIdentifier
     local business = Config.Businesses[index]
     if not business then return end
 
@@ -70,7 +72,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJob(business.job)
         character.setJobGrade(tonumber(business.grade))
 
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {business.job, business.grade, identifier})
+        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {business.job, business.grade, identifier})
         exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {index, identifier})
 
         businessOwners[index] = identifier
@@ -89,7 +91,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         character.setJob("unemployed", 0)
         character.setJobGrade(0)
 
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {"unemployed", 0, identifier})
+        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {"unemployed", 0, identifier})
         exports.ghmattimysql:execute("DELETE FROM business_owners WHERE business_id = ? AND owner_id = ?", {index, identifier})
 
         businessOwners[index] = nil
@@ -110,7 +112,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         end
 
         local TargetCharacter = TargetUser.getUsedCharacter
-        local targetIdentifier = TargetCharacter.identifier
+        local targetIdentifier = TargetCharacter.charIdentifier
 
         for _, owner in pairs(businessOwners) do
             if owner == targetIdentifier then
@@ -123,8 +125,8 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
         TargetCharacter.setJob(business.job)
         TargetCharacter.setJobGrade(tonumber(business.grade))
 
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {business.job, business.grade, targetIdentifier})
-        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE identifier = ?", {"unemployed", 0, identifier})
+        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {business.job, business.grade, targetIdentifier})
+        exports.ghmattimysql:execute("UPDATE characters SET job = ?, jobgrade = ? WHERE charidentifier = ?", {"unemployed", 0, identifier})
         exports.ghmattimysql:execute("DELETE FROM business_owners WHERE business_id = ? AND owner_id = ?", {index, identifier})
         exports.ghmattimysql:execute("INSERT INTO business_owners (business_id, owner_id) VALUES (?, ?)", {index, targetIdentifier})
 
