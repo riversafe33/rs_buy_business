@@ -1,4 +1,4 @@
-local VorpCore = exports.vorp_core:GetCore()
+local VorpCore = exports.vorp_core:GetCore()Add commentMore actions
 local Menu = exports.vorp_menu:GetMenuData()
 local prompt = nil
 local businessOwners = {}
@@ -19,22 +19,16 @@ end)
 RegisterNetEvent("rs_buy_business:setOwners")
 AddEventHandler("rs_buy_business:setOwners", function(businessData)
     businessOwners = businessData
-
-    for businessId, ownerId in pairs(businessData) do
-    end
 end)
 
 local function createPrompt()
     if not prompt then
-        prompt = Uiprompt:new(`INPUT_DYNAMIC_SCENARIO`, "Business")
+        prompt = Uiprompt:new(`INPUT_DYNAMIC_SCENARIO`, Config.Locale.PromptText)
         prompt:setEnabled(false)
         prompt:setVisible(false)
 
         prompt:setOnControlJustPressed(function()
-
-            if not currentBusinessIndex then
-                return
-            end
+            if not currentBusinessIndex then return end
 
             local businessIndex = currentBusinessIndex
             local owner = businessOwners[businessIndex]
@@ -49,14 +43,14 @@ local function createPrompt()
 
             if owner == nil then
                 if alreadyOwns then
-                    TriggerEvent("vorp:TipRight", "You already own another business.", 3000)
+                    TriggerEvent("vorp:TipRight", Config.Locale.Tip_AlreadyOwnBusiness, 3000)
                 else
                     openBusinessMenu(businessIndex)
                 end
             elseif owner == myIdentifier then
                 openBusinessMenu(businessIndex)
             else
-                TriggerEvent("vorp:TipRight", "This business already has an owner.", 3000)
+                TriggerEvent("vorp:TipRight", Config.Locale.Tip_AlreadyHasOwner, 3000)
             end
         end)
     end
@@ -102,7 +96,6 @@ Citizen.CreateThread(function()
             currentBusinessIndex = closestBusinessIndex
             prompt:setEnabled(true)
             prompt:setVisible(true)
-
         else
             if prompt then
                 prompt:setEnabled(false)
@@ -122,16 +115,20 @@ function openBusinessMenu(index)
     local business = Config.Businesses[index]
 
     if businessOwners[index] == myIdentifier then
-        table.insert(elements, {label = "Sell Business", value = "sell", desc = "Sell the business for 60% of its value"})
-        table.insert(elements, {label = "Transfer Business", value = "transfer", desc = "Transfer the business to another player"})
+        table.insert(elements, {label = Config.Locale.Menu.SellLabel, value = "sell", desc = Config.Locale.Menu.SellDesc})
+        table.insert(elements, {label = Config.Locale.Menu.TransferLabel, value = "transfer", desc = Config.Locale.Menu.TransferDesc})
     else
-        table.insert(elements, {label = "Buy Business", value = "buy", desc = "Buy the business for $" .. business.price})
+        table.insert(elements, {
+            label = Config.Locale.Menu.BuyLabel,
+            value = "buy",
+            desc = Config.Locale.Menu.BuyDescPrefix .. business.price
+        })
     end
 
     Menu.CloseAll()
     Menu.Open("default", GetCurrentResourceName(), "business_menu", {
-        title = "Business Menu",
-        subtext = "Select an action",
+        title = Config.Locale.Menu.Title,
+        subtext = Config.Locale.Menu.Subtext,
         align = "top-right",
         elements = elements,
         itemHeight = "4vh"
@@ -154,14 +151,14 @@ function OpenSellInput(index)
     local myInput = {
         type = "enableinput",
         inputType = "input",
-        button = "Confirm",
-        placeholder = "Player ID",
+        button = Config.Locale.Input.Button,
+        placeholder = Config.Locale.Input.Placeholder,
         style = "block",
         attributes = {
-            inputHeader = "Transfer Business",
+            inputHeader = Config.Locale.Input.Header,
             type = "text",
             pattern = "[0-9]+",
-            title = "Numbers only",
+            title = Config.Locale.Input.Title,
             style = "border-radius: 10px; background-color: ; border:none;"
         }
     }
@@ -173,9 +170,9 @@ function OpenSellInput(index)
         if result then
             TriggerServerEvent("rs_buy_business:handleAction", index, "transfer", result)
         else
-            TriggerEvent("vorp:TipRight", "Invalid ID.", 3000)
+            TriggerEvent("vorp:TipRight", Config.Locale.Tip_InvalidID, 3000)
         end
     else
-        TriggerEvent("vorp:TipRight", "Operation cancelled.", 3000)
+        TriggerEvent("vorp:TipRight", Config.Locale.Tip_Cancelled, 3000)
     end
 end
