@@ -14,6 +14,7 @@ Config.Locale = {
     Tip_InvalidDestination = "Invalid destination.",
     Tip_TargetOwnsBusiness = "The destination player already owns a business.",
     Tip_TransferSuccess = "You have successfully transferred the business.",
+    Tip_YouHaveNewBusiness = "You have received new business",
 
     Menu = {
         Title = "Business Menu",
