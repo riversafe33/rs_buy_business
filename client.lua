@@ -2,7 +2,7 @@ local VorpCore = exports.vorp_core:GetCore()
 local Menu = exports.vorp_menu:GetMenuData()
 local prompt = nil
 local businessOwners = {}
-local myIdentifier = nil
+local myIdentifier = LocalPlayer.state.Character.CharId
 local currentBusinessIndex = nil
 
 Citizen.CreateThread(function()
