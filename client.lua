@@ -176,14 +176,14 @@ function OpenSellInput(index)
     local myInput = {
         type = "enableinput",
         inputType = "input",
-        button = "Confirmar",
-        placeholder = "ID del Jugador",
+        button = Config.Locale.Input.Button,
+        placeholder = Config.Locale.Input.Placeholder,
         style = "block",
         attributes = {
-            inputHeader = "Transferir Negocio",
+            inputHeader = Config.Locale.Input.Header,
             type = "text",
             pattern = "[0-9]+",
-            title = "Solo números",
+            title = Config.Locale.Input.Title,
             style = "border-radius: 10px; background-color: ; border:none;"
         }
     }
