@@ -18,6 +18,9 @@ Syncing business ownership updates to all connected clients.
 
 Notifications to players about successful transactions or error messages.
 
+Once you have purchased a business, you will only see the prompt for the business you own
+and you will no longer see the prompts for available businesses until you sell or transfer your ownership.
+
 ![image](https://github.com/user-attachments/assets/879be5c2-9ad2-4b58-9bf1-56945ce8e6fa)
 ![image](https://github.com/user-attachments/assets/568e0b39-25d5-418f-8a97-97bc9be2503b)
 ![image](https://github.com/user-attachments/assets/1b7219ed-4289-43cf-9a0d-05efe9e905a9)
