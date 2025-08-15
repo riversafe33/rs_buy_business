@@ -1,3 +1,6 @@
+Dependency
+https://github.com/riversafe33/uiprompt
+
 Script Description:
 
 This script manages the buying, selling, and transferring of businesses in a RedM server using the VORP framework. 
