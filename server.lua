@@ -93,7 +93,7 @@ AddEventHandler("rs_buy_business:handleAction", function(index, action, targetId
             return
         end
 
-        local refund = math.floor(business.price * 0.6)
+        local refund = math.floor(business.price * Config.Sellprice)
         character.addCurrency(0, refund)
         character.setJob("unemployed", 0)
         character.setJobGrade(0)
