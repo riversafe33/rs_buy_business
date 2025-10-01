@@ -35,6 +35,7 @@ Config.Locale = {
     }
 }
 
+Config.Sellprice = 0.6 -- 60% of the original value 1.0 returns you the same as the cost original
 
 Config.Businesses = {
     [1] = {
