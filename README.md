@@ -1,3 +1,5 @@
+# Remove -main the folder should be named just rs_buy_business
+
 To improve my PC and continue offering free scripts: https://ko-fi.com/riversafe33
 
 Dependency
