@@ -44,7 +44,7 @@ Config.Businesses = {
         job = "generaltw",                           -- job assigned to the player when buying the business
         grade = 3,                                   -- grade assigned to the player when buying the business
         name = "General Store",                      -- business name
-        owner = nil                                  -- do not change
+        owner = nil                                  -- Don't change it
     },
     -- add more companies continuing with the [2]
 }
